@@ -1,0 +1,11 @@
+id = "vue-i18n"
+name = "Vue I18n"
+version = "0.1.0"
+schema_version = 1
+authors = ["XusCloud <XusCloud@gmail.com>"]
+description = "Show configurable inline translations for i18n keys in Vue/TS/TSX, with hover, diagnostics, completion, definition, and references."
+repository = "https://github.com/XusCloud/zed-vue-i18n"
+
+[language_servers.vue-i18n]
+name = "Vue I18n Language Server"
+languages = ["Vue.js", "TypeScript", "TSX", "JavaScript", "JSON", "JSONC"]

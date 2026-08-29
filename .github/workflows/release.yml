@@ -1,0 +1,67 @@
+name: Release Server Binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-and-release:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            asset_name: vue-i18n-server-aarch64-apple-darwin.gz
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            asset_name: vue-i18n-server-x86_64-apple-darwin.gz
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            asset_name: vue-i18n-server-x86_64-unknown-linux-gnu.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            asset_name: vue-i18n-server-x86_64-pc-windows-msvc.gz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build binary
+        run: cargo build -p vue-i18n-server --release --target ${{ matrix.target }}
+
+      - name: Compress binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          gzip -c target/${{ matrix.target }}/release/vue-i18n-server > ${{ matrix.asset_name }}
+
+      - name: Compress binary (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          $src = "target/${{ matrix.target }}/release/vue-i18n-server.exe"
+          $dst = "${{ matrix.asset_name }}"
+          # 压缩为 gz 格式
+          $inputStream = [System.IO.File]::OpenRead($src)
+          $outputStream = [System.IO.File]::Create($dst)
+          $gzipStream = New-Object System.IO.Compression.GZipStream($outputStream, [System.IO.Compression.CompressionMode]::Compress)
+          $inputStream.CopyTo($gzipStream)
+          $gzipStream.Close()
+          $outputStream.Close()
+          $inputStream.Close()
+
+      - name: Upload to Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.asset_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
