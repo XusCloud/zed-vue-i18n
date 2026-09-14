@@ -1,4 +1,4 @@
-id = "vue-i18n"
+id = "vue-i18n-language-server"
 name = "Vue I18n"
 version = "0.1.0"
 schema_version = 1
