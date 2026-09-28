@@ -108,3 +108,7 @@ cargo build -p vue-i18n-extension --target wasm32-wasip1 --release
 - Choose the `extension` directory within the cloned repository.
 
 ---
+
+## Prior Art
+
+- This is a [Rust] port of the original [zed-i18n-lens](https://github.com/yizixu/zed-i18n-lens)
